@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Thorn & Wynn Translator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ---------- Basic reset ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ---------- Page layout ---------- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, Helvetica, Arial, sans-serif;
+    background: #f9fafb;
+    color: #212529;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+/* Center the main container */
+main {
+    max-width: 600px;
+    margin: auto;
+    width: 100%;
+}
+
+/* ---------- Header ---------- */
+h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+}
+
+/* ---------- Textarea ---------- */
+textarea {
+    width: 100%;
+    min-height: 150px;
+    resize: vertical;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: #fff;
+}
+
+/* ---------- Controls ---------- */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    justify-content: space-between;
+}
+
+button,
+label.switch {
+    flex: 1 1 auto;
+    min-width: 120px;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+/* Button colors */
+button.translate { background: #0d6efd; color: #fff; }
+button.copy      { background: #198754; color: #fff; }
+button:disabled  { opacity: 0.6; cursor: not-allowed; }
+
+/* Toggle switch for Wynn */
+label.switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #6c757d;
+    color: #fff;
+}
+input#wynnToggle { margin-right: 0.5rem; }
+
+/* ---------- Footer ---------- */
+footer {
+    text-align: center;
+    margin-top: auto;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+</style>
+</head>
+
+<body>
+<main>
+    <h1>Thorn &amp; Wynn Translator</h1>
+
+    <textarea id="inputText" placeholder="Type or paste your text here…"></textarea>
+
+    <div class="controls">
+        <button class="translate" id="translateBtn">Translate</button>
+        <button class="copy" id="copyBtn" disabled>Copy</button>
+        <label class="switch">
+            <input type="checkbox" id="wynnToggle">
+            Include Wynn (ƿ/Ƿ)
+        </label>
+    </div>
+</main>
+
+<footer>
+    © 2026 Bruinbier’s Thorn Project – Open‑source, no tracking
+</footer>
+
+<script>
+// ---------- Helper functions ----------
+function replaceThorn(text) {
+    // Replace lower‑case “th”
+    text = text.replace(/th/g, 'þ');
+    // Replace upper‑case “Th” (first letter capital)
+    text = text.replace(/Th/g, 'Þ');
+    // Replace all‑caps “TH”
+    text = text.replace(/TH/g, 'Þ');
+    return text;
+}
+
+function replaceWynn(text) {
+    // Lower‑case “w”
+    text = text.replace(/w/g, 'ƿ');
+    // Upper‑case “W”
+    text = text.replace(/W/g, 'Ƿ');
+    return text;
+}
+
+// ---------- Main logic ----------
+document.getElementById('translateBtn').addEventListener('click', () => {
+    const textarea = document.getElementById('inputText');
+    let txt = textarea.value;
+
+    // Perform replacements
+    txt = replaceThorn(txt);
+    if (document.getElementById('wynnToggle').checked) {
+        txt = replaceWynn(txt);
+    }
+
+    textarea.value = txt;
+    // Enable copy button now that we have output
+    document.getElementById('copyBtn').disabled = false;
+});
+
+document.getElementById('copyBtn').addEventListener('click', async () => {
+    const textarea = document.getElementById('inputText');
+    try {
+        await navigator.clipboard.writeText(textarea.value);
+        // Brief visual feedback
+        const btn = document.getElementById('copyBtn');
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = original, 1500);
+    } catch (err) {
+        alert('Copy failed – your browser may block clipboard access.');
+    }
+});
+</script>
+</body>
+</html>
